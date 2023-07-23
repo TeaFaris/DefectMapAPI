@@ -1,4 +1,5 @@
 using DefectMapAPI.Data;
+using DefectMapAPI.Services.FileHostService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,10 @@ builder.Services
                 new HeaderApiVersionReader("X-Version")
             );
     });
+
+// File
+builder.Services
+    .AddScoped<IFileHost, FileHost>();
 
 builder.Services.AddVersionedApiExplorer(options =>
 {
