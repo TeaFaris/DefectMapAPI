@@ -5,8 +5,8 @@ namespace DefectMapAPI.Services.FileHostService
 {
     public class FileHost : IFileHost
     {
-        public const string UploadsDirectoryPath = "Uploads";
-        public const long MaxFileSize = 1024 * 1024 * 8;
+        public string UploadsDirectoryPath { get; init; } = "Uploads";
+        public long MaxFileSize { get; init; } = 1024 * 1024 * 8;
 
         private readonly ILogger<FileHost> logger;
         private readonly IWebHostEnvironment env;
