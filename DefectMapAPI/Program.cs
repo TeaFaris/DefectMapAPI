@@ -1,5 +1,6 @@
 using DefectMapAPI.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,9 @@ builder.Services
         options.AssumeDefaultVersionWhenUnspecified = true;
         options.DefaultApiVersion = new ApiVersion(1, 0);
         options.ReportApiVersions = true;
+        options.ApiVersionReader = ApiVersionReader.Combine(
+                new HeaderApiVersionReader("X-Version")
+            );
     });
 
 builder.Services.AddVersionedApiExplorer(options =>
