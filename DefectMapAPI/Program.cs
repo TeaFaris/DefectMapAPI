@@ -1,5 +1,6 @@
 using DefectMapAPI.Data;
 using DefectMapAPI.Services.FileHostService;
+using DefectMapAPI.Services.Repositories.File;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,10 @@ builder.Services
 // File
 builder.Services
     .AddScoped<IFileHost, FileHost>();
+
+// Repositories
+builder.Services
+    .AddScoped<IFileRepository, FileRepository>();
 
 builder.Services.AddVersionedApiExplorer(options =>
 {
