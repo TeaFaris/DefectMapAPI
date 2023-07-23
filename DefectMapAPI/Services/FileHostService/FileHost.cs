@@ -70,5 +70,28 @@ namespace DefectMapAPI.Services.FileHostService
 
             return uploadResult;
         }
+
+        public async Task Delete(UploadedFile file)
+        {
+            var pathToFile = Path.Combine(env.ContentRootPath,
+                    "Uploads",
+                    file.StoredFileName);
+
+            if (!File.Exists(pathToFile))
+            {
+                logger.LogError("File '{FileName}' on path '{pathToFile}' doesn't exist.", file.FileName, pathToFile);
+                throw new IOException($"File '{file.FileName}' on path '{pathToFile}' doesn't exist.");
+            }
+
+            try
+            {
+                File.Delete(pathToFile);
+            }
+            catch (IOException ex)
+            {
+                logger.LogError("{FileName} error on delete: {Message}", file.FileName, ex.Message);
+                throw;
+            }
+        }
     }
 }
