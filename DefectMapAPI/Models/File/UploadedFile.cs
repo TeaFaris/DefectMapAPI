@@ -7,12 +7,12 @@ namespace DefectMapAPI.Models.File
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
+        public Guid Id { get; init; }
         [Required]
-        public string FileName { get; set; }
+        public string FileName { get; init; }
         [Required]
-        public string StoredFileName { get; set; }
+        public string StoredFileName { get; init; }
         [Required]
-        public string ContentType { get; set; }
+        public string ContentType { get; init; }
     }
 }

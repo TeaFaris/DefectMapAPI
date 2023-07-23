@@ -19,11 +19,9 @@ namespace DefectMapAPI.Services.FileHostService
 
         public async Task<UploadedFile> Upload(Stream fileStream, string fileName, string contentType)
         {
-            var uploadResult = new UploadedFile();
 
             string trustedFileNameForFileStorage;
             var untrustedFileName = fileName;
-            uploadResult.FileName = untrustedFileName;
             var trustedFileNameForDisplay =
                 WebUtility.HtmlEncode(untrustedFileName);
 
@@ -55,8 +53,6 @@ namespace DefectMapAPI.Services.FileHostService
 
                 logger.LogInformation("{FileName} saved at {Path}",
                     trustedFileNameForDisplay, path);
-                uploadResult.StoredFileName = trustedFileNameForFileStorage;
-                uploadResult.ContentType = contentType;
             }
             catch (IOException ex)
             {
@@ -64,6 +60,13 @@ namespace DefectMapAPI.Services.FileHostService
                     trustedFileNameForDisplay, ex.Message);
                 throw;
             }
+
+            var uploadResult = new UploadedFile
+            {
+                FileName = untrustedFileName,
+                StoredFileName = trustedFileNameForFileStorage,
+                ContentType = contentType,
+            };
 
             return uploadResult;
         }
