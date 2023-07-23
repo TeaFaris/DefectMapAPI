@@ -2,7 +2,7 @@
 using DefectMapAPI.Services.Repositories.File;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DefectMapAPI.Controllers
+namespace DefectMapAPI.Controllers.v1
 {
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
