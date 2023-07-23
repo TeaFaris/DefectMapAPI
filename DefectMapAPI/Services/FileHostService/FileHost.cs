@@ -5,6 +5,7 @@ namespace DefectMapAPI.Services.FileHostService
 {
     public class FileHost : IFileHost
     {
+        public const string UploadsDirectoryPath = "Uploads";
         public const long MaxFileSize = 1024 * 1024 * 8;
 
         private readonly ILogger<FileHost> logger;
@@ -45,7 +46,7 @@ namespace DefectMapAPI.Services.FileHostService
             {
                 trustedFileNameForFileStorage = Path.GetRandomFileName();
                 var path = Path.Combine(env.ContentRootPath,
-                    "Uploads",
+                    UploadsDirectoryPath,
                     trustedFileNameForFileStorage);
 
                 await using FileStream fs = new(path, FileMode.Create);
@@ -74,7 +75,7 @@ namespace DefectMapAPI.Services.FileHostService
         public async Task Delete(UploadedFile file)
         {
             var pathToFile = Path.Combine(env.ContentRootPath,
-                    "Uploads",
+                    UploadsDirectoryPath,
                     file.StoredFileName);
 
             if (!File.Exists(pathToFile))
