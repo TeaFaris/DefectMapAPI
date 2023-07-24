@@ -2,6 +2,7 @@ using DefectMapAPI.Data;
 using DefectMapAPI.Services.FileHostService;
 using DefectMapAPI.Services.Repositories.File;
 using DefectMapAPI.Services.Repositories.User;
+using DefectMapAPI.Services.UserAuthenticationManagerService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -54,6 +55,10 @@ builder.Services
                 new HeaderApiVersionReader("X-Version")
             );
     });
+
+// User authentication service
+builder.Services
+    .AddScoped<IUserAuthenticationManager, UserAuthenticationManager>();
 
 // File
 builder.Services
