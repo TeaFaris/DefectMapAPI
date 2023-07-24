@@ -25,7 +25,7 @@ namespace DefectMapAPI.Services.JwtTokenGeneratorService
 
         private JwtSecurityToken GenerateSecurityToken(ApplicationUser applicationUser)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtSettings:Key"]!));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]

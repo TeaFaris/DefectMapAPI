@@ -21,11 +21,12 @@ namespace DefectMapAPI.Services.UserAuthenticationManagerService
 
             var user = usersFound.FirstOrDefault();
 
-            var isValidPassword = BCrypt.Net.BCrypt.Verify(password, user?.PasswordHash);
+            var isValidPassword = BCrypt.Net.BCrypt.Verify(password, user?.PasswordHash ?? "");
 
             return new LoginUserResult
             {
-                Successful = isValidPassword
+                Successful = isValidPassword,
+                User = isValidPassword ? user : null
             };
         }
 
@@ -54,6 +55,10 @@ namespace DefectMapAPI.Services.UserAuthenticationManagerService
                 Username = username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
             };
+
+            await userRepository.AddAsync(newUser);
+
+            await userRepository.SaveAsync();
 
             return new RegisterUserResult
             {

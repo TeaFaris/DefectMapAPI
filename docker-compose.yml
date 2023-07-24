@@ -15,6 +15,9 @@ services:
       dockerfile: DefectMapAPI/Dockerfile
     environment:
       ConnectionStrings__DefaultConnection: "User ID=postgres;Password=postgres;Server=defectmapapi_db;Port=5432;Database=DefectMapAPI;Pooling=true;"
+      JwtSettings__Issuer: "https://localhost:52919/"
+      JwtSettings__Audience: "https://localhost:52919/"
+      JwtSettings__Key: "ZUia9JmPIlE9MJCD3Jwx0atFPvMpbZk4"
     networks:
       - dev
   defectmapapi_db:
