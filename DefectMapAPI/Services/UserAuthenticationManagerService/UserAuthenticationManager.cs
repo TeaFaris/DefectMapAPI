@@ -1,9 +1,6 @@
 ﻿using DefectMapAPI.Models;
-using DefectMapAPI.Models.Shared.LoginUser;
-using DefectMapAPI.Models.Shared.RegisterUser;
-using DefectMapAPI.Models.Shared.Requests;
 using DefectMapAPI.Services.Repositories.User;
-using System.ComponentModel.DataAnnotations;
+using DefectMapAPI.Services.UserAuthenticationManagerService.Models;
 
 namespace DefectMapAPI.Services.UserAuthenticationManagerService
 {
@@ -18,35 +15,25 @@ namespace DefectMapAPI.Services.UserAuthenticationManagerService
             this.userRepository = userRepository;
         }
 
-        public async Task<LoginUserResponse> ValidateCredentials(LoginUserRequest loginRequest)
+        public async Task<LoginUserResult> ValidateCredentials(string username, string password)
         {
-            var usersFound = await userRepository.FindAsync(x => x.Username == loginRequest.Username);
+            var usersFound = await userRepository.FindAsync(x => x.Username == username);
 
             var user = usersFound.FirstOrDefault();
 
-            var isValidPassword = BCrypt.Net.BCrypt.Verify(loginRequest.Password, user?.PasswordHash);
+            var isValidPassword = BCrypt.Net.BCrypt.Verify(password, user?.PasswordHash);
 
-            return new LoginUserResponse
+            return new LoginUserResult
             {
                 Successful = isValidPassword
             };
         }
 
-        public async Task<RegisterUserResponse> Register(RegisterUserRequest registerRequest)
+        public async Task<RegisterUserResult> Register(string username, string password)
         {
             var errors = new List<string>();
 
-            var validationContext = new ValidationContext(registerRequest);
-            ICollection<ValidationResult>? validationResults = null;
-
-            if (!Validator.TryValidateObject(registerRequest, validationContext, validationResults, true))
-            {
-                errors.AddRange(validationResults!
-                                    .Where(x => x.ErrorMessage is not null)
-                                    .Select(x => x.ErrorMessage!));
-            }
-
-            var usersWithSameUsername = await userRepository.FindAsync(x => x.Username == registerRequest.Username);
+            var usersWithSameUsername = await userRepository.FindAsync(x => x.Username == username);
 
             if (usersWithSameUsername.Any())
             {
@@ -55,7 +42,7 @@ namespace DefectMapAPI.Services.UserAuthenticationManagerService
 
             if (errors.Any())
             {
-                return new RegisterUserResponse
+                return new RegisterUserResult
                 {
                     Successful = false,
                     Errors = errors
@@ -64,11 +51,11 @@ namespace DefectMapAPI.Services.UserAuthenticationManagerService
 
             var newUser = new ApplicationUser
             {
-                Username = registerRequest.Username,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password)
+                Username = username,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
             };
 
-            return new RegisterUserResponse
+            return new RegisterUserResult
             {
                 Successful = true,
                 User = newUser

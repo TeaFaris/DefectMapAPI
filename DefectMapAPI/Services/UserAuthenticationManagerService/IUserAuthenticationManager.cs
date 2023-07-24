@@ -1,13 +1,10 @@
-﻿using DefectMapAPI.Models;
-using DefectMapAPI.Models.Shared.LoginUser;
-using DefectMapAPI.Models.Shared.RegisterUser;
-using DefectMapAPI.Models.Shared.Requests;
+﻿using DefectMapAPI.Services.UserAuthenticationManagerService.Models;
 
 namespace DefectMapAPI.Services.UserAuthenticationManagerService
 {
     public interface IUserAuthenticationManager
     {
-        Task<RegisterUserResponse> Register(RegisterUserRequest request);
-        Task<LoginUserResponse> ValidateCredentials(LoginUserRequest request);
+        Task<RegisterUserResult> Register(string username, string password);
+        Task<LoginUserResult> ValidateCredentials(string username, string password);
     }
 }
