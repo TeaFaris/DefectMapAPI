@@ -1,6 +1,7 @@
 using DefectMapAPI.Data;
 using DefectMapAPI.Services.FileHostService;
 using DefectMapAPI.Services.Repositories.File;
+using DefectMapAPI.Services.Repositories.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -61,6 +62,8 @@ builder.Services
 // Repositories
 builder.Services
     .AddScoped<IFileRepository, FileRepository>();
+builder.Services
+    .AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddVersionedApiExplorer(options =>
 {
