@@ -1,5 +1,6 @@
 using DefectMapAPI.Data;
 using DefectMapAPI.Services.FileHostService;
+using DefectMapAPI.Services.JwtTokenGeneratorService;
 using DefectMapAPI.Services.Repositories.File;
 using DefectMapAPI.Services.Repositories.User;
 using DefectMapAPI.Services.UserAuthenticationManagerService;
@@ -59,6 +60,10 @@ builder.Services
 // User authentication service
 builder.Services
     .AddScoped<IUserAuthenticationManager, UserAuthenticationManager>();
+
+// JWT Generator
+builder.Services
+    .AddSingleton<JwtTokenGenerator>();
 
 // File
 builder.Services
