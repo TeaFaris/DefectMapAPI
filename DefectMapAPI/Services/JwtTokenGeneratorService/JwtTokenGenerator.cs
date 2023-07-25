@@ -34,8 +34,8 @@ namespace DefectMapAPI.Services.JwtTokenGeneratorService
                 new Claim(ClaimTypes.Name, applicationUser.Username)
             };
 
-            var token = new JwtSecurityToken(config["Jwt:Issuer"],
-                config["Jwt:Audience"],
+            var token = new JwtSecurityToken(config["JwtSettings:Issuer"],
+                config["JwtSettings:Audience"],
                 claims,
                 expires: DateTime.Now.AddMinutes(15),
                 signingCredentials: credentials);
