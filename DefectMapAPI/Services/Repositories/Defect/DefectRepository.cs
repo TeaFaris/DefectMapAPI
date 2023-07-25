@@ -8,12 +8,10 @@ namespace DefectMapAPI.Services.Repositories.Defect
     public class DefectRepository : IDefectRepository
     {
         readonly ApplicationDbContext dbContext;
-        readonly IFileRepository fileRepository;
         public DefectRepository(
                 ApplicationDbContext dbContext
             )
         {
-            this.fileRepository = fileRepository;
             this.dbContext = dbContext;
         }
 
@@ -38,12 +36,18 @@ namespace DefectMapAPI.Services.Repositories.Defect
 
         public async Task<IEnumerable<Models.Defect.Defect>> GetAllAsync()
         {
-            return await dbContext.Defects.ToListAsync();
+            return await dbContext
+                .Defects
+                .Include(x => x.Owner)
+                .ToListAsync();
         }
 
         public async Task<Models.Defect.Defect?> GetAsync(int id)
         {
-            return await dbContext.Defects.FindAsync(id);
+            return await dbContext
+                .Defects
+                .Include(x => x.Owner)
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task RemoveAsync(Models.Defect.Defect entity)
