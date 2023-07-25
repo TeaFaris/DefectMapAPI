@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DefectMapAPI.Models
+namespace DefectMapAPI.Models.UserModel
 {
     public class ApplicationUser
     {

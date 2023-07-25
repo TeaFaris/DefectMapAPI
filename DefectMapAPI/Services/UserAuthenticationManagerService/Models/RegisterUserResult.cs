@@ -1,4 +1,4 @@
-﻿using DefectMapAPI.Models;
+﻿using DefectMapAPI.Models.UserModel;
 
 namespace DefectMapAPI.Services.UserAuthenticationManagerService.Models
 {
