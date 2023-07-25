@@ -1,6 +1,7 @@
 using DefectMapAPI.Data;
 using DefectMapAPI.Services.FileHostService;
 using DefectMapAPI.Services.JwtTokenGeneratorService;
+using DefectMapAPI.Services.Repositories.Defect;
 using DefectMapAPI.Services.Repositories.File;
 using DefectMapAPI.Services.Repositories.User;
 using DefectMapAPI.Services.UserAuthenticationManagerService;
@@ -77,6 +78,8 @@ builder.Services
     .AddScoped<IFileRepository, FileRepository>();
 builder.Services
     .AddScoped<IUserRepository, UserRepository>();
+builder.Services
+    .AddScoped<IDefectRepository, DefectRepository>();
 
 builder.Services.AddVersionedApiExplorer(options =>
 {
