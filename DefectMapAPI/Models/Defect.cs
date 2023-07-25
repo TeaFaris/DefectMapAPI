@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DefectMapAPI.Models
 {
@@ -15,6 +16,10 @@ namespace DefectMapAPI.Models
 
         [Required]
         public List<Guid> PhotosIds { get; set; }
+
+        public int OwnerId { get; init; }
+        [ForeignKey(nameof(OwnerId))]
+        public ApplicationUser Owner { get; init; }
 
         public double Latitude { get; set; }
         public double Longitude { get; set; }
