@@ -53,7 +53,8 @@ namespace DefectMapAPI.Services.UserAuthenticationManagerService
             var newUser = new ApplicationUser
             {
                 Username = username,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+                Role = UserRoles.User.ToString()
             };
 
             await userRepository.AddAsync(newUser);

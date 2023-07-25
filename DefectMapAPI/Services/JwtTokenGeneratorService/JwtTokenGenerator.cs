@@ -31,7 +31,8 @@ namespace DefectMapAPI.Services.JwtTokenGeneratorService
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, applicationUser.Id.ToString()),
-                new Claim(ClaimTypes.Name, applicationUser.Username)
+                new Claim(ClaimTypes.Name, applicationUser.Username),
+                new Claim(ClaimTypes.Role, applicationUser.Role)
             };
 
             var token = new JwtSecurityToken(config["JwtSettings:Issuer"],
