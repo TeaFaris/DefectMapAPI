@@ -57,11 +57,19 @@ namespace DefectMapAPI.Controllers.v1
             return Ok(await defect.ToDTO(fileRepository));
         }
 
+        [HttpGet("find")]
+        public async Task<IActionResult> Find([FromQuery] string name)
+        {
+            var foundDefects = await defectRepository.FindAsync(x => x.Name == name);
+
+            return Ok(foundDefects);
+        }
+
         [HttpPost("UploadPhotos")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Administrator")]
         public async Task<IActionResult> UploadDefectPhoto([FromForm] IList<IFormFile> photos)
         {
-            if (!photos.Any() || photos.Any(x => x.ContentType is not "image/png" and not "image/jpeg"))
+            if (!photos.Any() || photos.Any(x => x.ContentType.ToLower() is not "image/png" and not "image/jpeg"))
             {
                 return new UnsupportedMediaTypeResult();
             }
@@ -85,7 +93,7 @@ namespace DefectMapAPI.Controllers.v1
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "User,Administrator")]
         public async Task<IActionResult> Create(DefectDTO defect)
         {
             if(defect.Photos.Count == 0)
