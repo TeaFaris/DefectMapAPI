@@ -1,5 +1,8 @@
 ﻿using DefectMapAPI.Configurations;
+using DefectMapAPI.Models.RefreshTokenModel;
 using DefectMapAPI.Models.UserModel;
+using DefectMapAPI.Services.JwtTokenGeneratorService.Models;
+using DefectMapAPI.Services.Repositories.RefreshToken;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,16 +16,50 @@ namespace DefectMapAPI.Services.JwtTokenGeneratorService
         private static readonly JwtSecurityTokenHandler SecurityTokenHandler = new();
 
         readonly JwtSettings jwtSettings;
-        public JwtTokenGenerator(IOptions<JwtSettings> jwtSettings)
+        readonly IRefreshTokenRepository refreshTokenRepository;
+        readonly TokenValidationParameters tokenValidationParameters;
+        public JwtTokenGenerator(
+                IOptions<JwtSettings> jwtSettings,
+                IRefreshTokenRepository refreshTokenRepository,
+                TokenValidationParameters tokenValidationParameters
+            )
         {
+            this.tokenValidationParameters = tokenValidationParameters;
+            this.refreshTokenRepository = refreshTokenRepository;
             this.jwtSettings = jwtSettings.Value;
         }
 
-        public string GenerateToken(ApplicationUser applicationUser)
+        public async Task<JwtTokensResult> GenerateTokens(ApplicationUser applicationUser)
         {
             var securityToken = GenerateSecurityToken(applicationUser);
 
-            return SecurityTokenHandler.WriteToken(securityToken);
+            var refreshToken = await GenerateRefreshToken(applicationUser, securityToken);
+            var jwtToken = SecurityTokenHandler.WriteToken(securityToken);
+
+            return new JwtTokensResult
+            {
+                JwtToken = jwtToken,
+                RefreshToken = refreshToken
+            };
+        }
+
+        private async Task<string> GenerateRefreshToken(ApplicationUser user, JwtSecurityToken token)
+        {
+            var refreshToken = new RefreshToken
+            {
+                JwtId = token.Id,
+                Token = Guid.NewGuid().ToString(),
+                AddedDate = DateTime.UtcNow,
+                ExpiryDate = DateTime.UtcNow.AddMonths(3),
+                Revoked = false,
+                Used = false,
+                ApplicationUser = user,
+            };
+
+            await refreshTokenRepository.AddAsync(refreshToken);
+            await refreshTokenRepository.SaveAsync();
+
+            return refreshToken.Token;
         }
 
         private JwtSecurityToken GenerateSecurityToken(ApplicationUser applicationUser)

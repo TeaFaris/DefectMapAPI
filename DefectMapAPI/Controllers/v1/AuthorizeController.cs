@@ -55,10 +55,13 @@ namespace DefectMapAPI.Controllers.v1
                 });
             }
 
+            var tokens = await jwtTokenGenerator.GenerateTokens(result.User!);
+
             return Ok(new LoginResponse
             {
                 Successful = true,
-                JwtToken = jwtTokenGenerator.GenerateToken(result.User!)
+                JwtToken = tokens.JwtToken,
+                RefreshToken = tokens.RefreshToken
             });
         }
     }

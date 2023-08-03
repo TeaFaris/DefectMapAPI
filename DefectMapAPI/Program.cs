@@ -50,6 +50,8 @@ builder.Services
         options.TokenValidationParameters = tokenValidationParameter;
     });
 
+builder.Services
+    .AddSingleton(tokenValidationParameter);
 
 builder.Services
     .AddAuthorization();
@@ -78,7 +80,7 @@ builder.Services
 
 // JWT Generator
 builder.Services
-    .AddSingleton<JwtTokenGenerator>();
+    .AddScoped<JwtTokenGenerator>();
 
 // File
 builder.Services
