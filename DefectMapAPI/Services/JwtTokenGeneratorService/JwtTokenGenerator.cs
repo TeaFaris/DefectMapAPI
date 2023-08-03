@@ -1,5 +1,6 @@
 ﻿using DefectMapAPI.Configurations;
 using DefectMapAPI.Models.UserModel;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -12,9 +13,9 @@ namespace DefectMapAPI.Services.JwtTokenGeneratorService
         private static readonly JwtSecurityTokenHandler SecurityTokenHandler = new();
 
         readonly JwtSettings jwtSettings;
-        public JwtTokenGenerator(JwtSettings jwtSettings)
+        public JwtTokenGenerator(IOptions<JwtSettings> jwtSettings)
         {
-            this.jwtSettings = jwtSettings;
+            this.jwtSettings = jwtSettings.Value;
         }
 
         public string GenerateToken(ApplicationUser applicationUser)
