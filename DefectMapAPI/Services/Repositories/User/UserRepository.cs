@@ -1,5 +1,5 @@
 ﻿using DefectMapAPI.Data;
-using DefectMapAPI.Models;
+using DefectMapAPI.Models.UserModel;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 

@@ -1,5 +1,6 @@
-﻿using DefectMapAPI.Models;
+﻿using DefectMapAPI.Models.Defect;
 using DefectMapAPI.Models.File;
+using DefectMapAPI.Models.UserModel;
 using Microsoft.EntityFrameworkCore;
 
 namespace DefectMapAPI.Data

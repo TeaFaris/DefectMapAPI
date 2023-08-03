@@ -1,4 +1,4 @@
-﻿using DefectMapAPI.Models;
+﻿using DefectMapAPI.Models.UserModel;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

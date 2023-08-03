@@ -8,26 +8,24 @@ namespace DefectMapAPI.Services.Repositories.Defect
     public class DefectRepository : IDefectRepository
     {
         readonly ApplicationDbContext dbContext;
-        readonly IFileRepository fileRepository;
         public DefectRepository(
                 ApplicationDbContext dbContext
             )
         {
-            this.fileRepository = fileRepository;
             this.dbContext = dbContext;
         }
 
-        public async Task AddAsync(Models.Defect entity)
+        public async Task AddAsync(Models.Defect.Defect entity)
         {
             await dbContext.Defects.AddAsync(entity);
         }
 
-        public async Task AddRangeAsync(IEnumerable<Models.Defect> entities)
+        public async Task AddRangeAsync(IEnumerable<Models.Defect.Defect> entities)
         {
             await dbContext.Defects.AddRangeAsync(entities);
         }
 
-        public async Task<IEnumerable<Models.Defect>> FindAsync(Expression<Func<Models.Defect, bool>> predicate)
+        public async Task<IEnumerable<Models.Defect.Defect>> FindAsync(Expression<Func<Models.Defect.Defect, bool>> predicate)
         {
             return await dbContext
                 .Defects
@@ -36,23 +34,29 @@ namespace DefectMapAPI.Services.Repositories.Defect
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Models.Defect>> GetAllAsync()
+        public async Task<IEnumerable<Models.Defect.Defect>> GetAllAsync()
         {
-            return await dbContext.Defects.ToListAsync();
+            return await dbContext
+                .Defects
+                .Include(x => x.Owner)
+                .ToListAsync();
         }
 
-        public async Task<Models.Defect?> GetAsync(int id)
+        public async Task<Models.Defect.Defect?> GetAsync(int id)
         {
-            return await dbContext.Defects.FindAsync(id);
+            return await dbContext
+                .Defects
+                .Include(x => x.Owner)
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task RemoveAsync(Models.Defect entity)
+        public async Task RemoveAsync(Models.Defect.Defect entity)
         {
             dbContext.Defects.Remove(entity);
             await Task.CompletedTask;
         }
 
-        public async Task RemoveRangeAsync(IEnumerable<Models.Defect> entities)
+        public async Task RemoveRangeAsync(IEnumerable<Models.Defect.Defect> entities)
         {
             dbContext.Defects.RemoveRange(entities);
             await Task.CompletedTask;
@@ -63,13 +67,13 @@ namespace DefectMapAPI.Services.Repositories.Defect
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Models.Defect entity)
+        public async Task UpdateAsync(Models.Defect.Defect entity)
         {
             dbContext.Defects.Update(entity);
             await Task.CompletedTask;
         }
 
-        public async Task UpdateRangeAsync(IEnumerable<Models.Defect> entities)
+        public async Task UpdateRangeAsync(IEnumerable<Models.Defect.Defect> entities)
         {
             dbContext.Defects.UpdateRange(entities);
             await Task.CompletedTask;

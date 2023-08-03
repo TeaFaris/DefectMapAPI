@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DefectMapAPI.Models.UserModel;
 
-namespace DefectMapAPI.Models
+namespace DefectMapAPI.Models.Defect
 {
     public class Defect
     {

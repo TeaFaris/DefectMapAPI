@@ -1,4 +1,4 @@
-﻿namespace DefectMapAPI.Models
+﻿namespace DefectMapAPI.Models.UserModel
 {
     public enum UserRoles
     {
