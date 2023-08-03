@@ -3,6 +3,7 @@ using DefectMapAPI.Models.RefreshTokenModel;
 using DefectMapAPI.Models.UserModel;
 using DefectMapAPI.Services.JwtTokenGeneratorService.Models;
 using DefectMapAPI.Services.Repositories.RefreshToken;
+using DefectMapAPI.Services.Repositories.User;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,25 +19,51 @@ namespace DefectMapAPI.Services.JwtTokenGeneratorService
         readonly JwtSettings jwtSettings;
         readonly IRefreshTokenRepository refreshTokenRepository;
         readonly TokenValidationParameters tokenValidationParameters;
+        readonly IUserRepository userRepository;
         public JwtTokenGenerator(
                 IOptions<JwtSettings> jwtSettings,
                 IRefreshTokenRepository refreshTokenRepository,
+                IUserRepository userRepository,
                 TokenValidationParameters tokenValidationParameters
             )
         {
+            this.userRepository = userRepository;
             this.tokenValidationParameters = tokenValidationParameters;
             this.refreshTokenRepository = refreshTokenRepository;
             this.jwtSettings = jwtSettings.Value;
         }
 
-        public async Task<JwtTokensResult> GenerateTokens(ApplicationUser applicationUser)
+        public async Task<JwtTokens?> VerifyAndGenerateTokens(string refreshToken)
+        {
+            var tokensFound = await refreshTokenRepository.FindAsync(x => x.Token == refreshToken);
+            var storedRefreshToken = tokensFound.FirstOrDefault();
+
+            if (storedRefreshToken is null
+                or { Revoked: true }
+                or { Used: true }
+                || DateTime.UtcNow > storedRefreshToken.ExpiryDate
+               )
+            {
+                return null;
+            }
+
+            storedRefreshToken.Used = true;
+            await refreshTokenRepository.UpdateAsync(storedRefreshToken);
+            await refreshTokenRepository.SaveAsync();
+
+            var user = (await userRepository.GetAsync(storedRefreshToken.UserId))!;
+
+            return await GenerateTokens(user);
+        }
+
+        public async Task<JwtTokens> GenerateTokens(ApplicationUser applicationUser)
         {
             var securityToken = GenerateSecurityToken(applicationUser);
 
             var refreshToken = await GenerateRefreshToken(applicationUser, securityToken);
             var jwtToken = SecurityTokenHandler.WriteToken(securityToken);
 
-            return new JwtTokensResult
+            return new JwtTokens
             {
                 JwtToken = jwtToken,
                 RefreshToken = refreshToken

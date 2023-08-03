@@ -57,12 +57,47 @@ namespace DefectMapAPI.Controllers.v1
 
             var tokens = await jwtTokenGenerator.GenerateTokens(result.User!);
 
+            SetCookiesRefreshToken(tokens.RefreshToken);
+
             return Ok(new LoginResponse
             {
                 Successful = true,
                 JwtToken = tokens.JwtToken,
                 RefreshToken = tokens.RefreshToken
             });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RefreshToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            if (refreshToken is null)
+            {
+                return Unauthorized("No 'refreshToken' provided in cookies.");
+            }
+
+            var generatedTokens = await jwtTokenGenerator.VerifyAndGenerateTokens(refreshToken);
+
+            if (generatedTokens is null)
+            {
+                return Unauthorized("Invalid refresh token.");
+            }
+
+            SetCookiesRefreshToken(generatedTokens.RefreshToken);
+
+            return Ok(generatedTokens);
+        }
+
+        private void SetCookiesRefreshToken(string refreshToken)
+        {
+            var cookiesOption = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.UtcNow.AddMonths(1)
+            };
+
+            Response.Cookies.Append("refreshToken", refreshToken, cookiesOption);
         }
     }
 }

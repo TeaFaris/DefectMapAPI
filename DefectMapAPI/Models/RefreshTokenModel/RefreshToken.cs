@@ -16,8 +16,8 @@ namespace DefectMapAPI.Models.RefreshTokenModel
         public string Token { get; init; }
         public string JwtId { get; init; }
 
-        public bool Used { get; init; }
-        public bool Revoked { get; init; }
+        public bool Used { get; set; }
+        public bool Revoked { get; set; }
 
         public DateTime AddedDate { get; init; }
         public DateTime ExpiryDate { get; init; }
