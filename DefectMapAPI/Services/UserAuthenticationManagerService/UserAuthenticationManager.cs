@@ -21,7 +21,7 @@ namespace DefectMapAPI.Services.UserAuthenticationManagerService
 
             var user = usersFound.FirstOrDefault();
 
-            var isValidPassword = BCrypt.Net.BCrypt.Verify(password, user?.PasswordHash ?? "");
+            var isValidPassword = user is not null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
 
             return new LoginUserResult
             {

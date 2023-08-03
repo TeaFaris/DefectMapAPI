@@ -1,22 +1,42 @@
+using DefectMapAPI.Configurations;
 using DefectMapAPI.Data;
 using DefectMapAPI.Services.FileHostService;
 using DefectMapAPI.Services.JwtTokenGeneratorService;
 using DefectMapAPI.Services.Repositories.Defect;
 using DefectMapAPI.Services.Repositories.File;
+using DefectMapAPI.Services.Repositories.RefreshToken;
 using DefectMapAPI.Services.Repositories.User;
 using DefectMapAPI.Services.UserAuthenticationManagerService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configs
 var config = builder.Configuration;
+
+builder.Services
+    .Configure<JwtSettings>(config.GetSection(nameof(JwtSettings)));
+
+// JWT
+
+var key = Encoding.UTF8.GetBytes(config["JwtSettings:Key"]!);
+
+var tokenValidationParameter = new TokenValidationParameters
+{
+    ValidIssuer = config["JwtSettings:Issuer"],
+    ValidAudience = config["JwtSettings:Audience"],
+    IssuerSigningKey = new SymmetricSecurityKey(key),
+    ValidateIssuer = true,
+    ValidateAudience = true,
+    ValidateLifetime = true,
+    ValidateIssuerSigningKey = true
+};
 
 builder.Services
     .AddAuthentication(options =>
@@ -27,18 +47,11 @@ builder.Services
     })
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidIssuer = config["JwtSettings:Issuer"],
-            ValidAudience = config["JwtSettings:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtSettings:Key"]!)),
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true
-        };
+        options.TokenValidationParameters = tokenValidationParameter;
     });
 
+builder.Services
+    .AddSingleton(tokenValidationParameter);
 
 builder.Services
     .AddAuthorization();
@@ -67,7 +80,7 @@ builder.Services
 
 // JWT Generator
 builder.Services
-    .AddSingleton<JwtTokenGenerator>();
+    .AddScoped<JwtTokenGenerator>();
 
 // File
 builder.Services
@@ -80,6 +93,8 @@ builder.Services
     .AddScoped<IUserRepository, UserRepository>();
 builder.Services
     .AddScoped<IDefectRepository, DefectRepository>();
+builder.Services
+    .AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 builder.Services.AddVersionedApiExplorer(options =>
 {
