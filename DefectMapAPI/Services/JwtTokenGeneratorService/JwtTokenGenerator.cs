@@ -1,4 +1,5 @@
-﻿using DefectMapAPI.Models.UserModel;
+﻿using DefectMapAPI.Configurations;
+using DefectMapAPI.Models.UserModel;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -10,10 +11,10 @@ namespace DefectMapAPI.Services.JwtTokenGeneratorService
     {
         private static readonly JwtSecurityTokenHandler SecurityTokenHandler = new();
 
-        readonly IConfiguration config;
-        public JwtTokenGenerator(IConfiguration config)
+        readonly JwtSettings jwtSettings;
+        public JwtTokenGenerator(JwtSettings jwtSettings)
         {
-            this.config = config;
+            this.jwtSettings = jwtSettings;
         }
 
         public string GenerateToken(ApplicationUser applicationUser)
@@ -25,7 +26,7 @@ namespace DefectMapAPI.Services.JwtTokenGeneratorService
 
         private JwtSecurityToken GenerateSecurityToken(ApplicationUser applicationUser)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtSettings:Key"]!));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
@@ -35,10 +36,10 @@ namespace DefectMapAPI.Services.JwtTokenGeneratorService
                 new Claim(ClaimTypes.Role, applicationUser.Role)
             };
 
-            var token = new JwtSecurityToken(config["JwtSettings:Issuer"],
-                config["JwtSettings:Audience"],
+            var token = new JwtSecurityToken(jwtSettings.Issuer,
+                jwtSettings.Audience,
                 claims,
-                expires: DateTime.Now.AddMinutes(15),
+                expires: DateTime.Now.Add(jwtSettings.ExpiryTime),
                 signingCredentials: credentials);
 
             return token;
