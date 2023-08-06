@@ -5,8 +5,10 @@ using DefectMapAPI.Models.UserModel;
 using DefectMapAPI.Services.FileHostService;
 using DefectMapAPI.Services.Repositories.Defect;
 using DefectMapAPI.Services.Repositories.File;
+using DefectMapAPI.Services.Repositories.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace DefectMapAPI.Controllers.v1
 {
@@ -101,12 +103,28 @@ namespace DefectMapAPI.Controllers.v1
                 return BadRequest("Defect must include atleast one photo.");
             }
 
+            foreach (var clientPhoto in defect.Photos)
+            {
+                var serverPhoto = await fileRepository.GetAsync(clientPhoto.Id);
+
+                if (serverPhoto is null)
+                {
+                    return BadRequest($"Photo with id '{clientPhoto.Id}' doesn't exsist.");
+                }
+            }
+
+            var userIdString = User
+                .Claims
+                .First(x => x.Type == ClaimTypes.NameIdentifier)
+                .Value;
+            var userId = int.Parse(userIdString);
+
             await defectRepository.AddAsync(new Defect
             {
                 Id = defect.Id,
                 Name = defect.Name,
                 Description = defect.Description,
-                OwnerId = defect.Owner.Id,
+                OwnerId = userId,
                 PhotosIds = defect.Photos.ConvertAll(x => x.Id),
                 HorizontalAccuracy = defect.HorizontalAccuracy,
                 Latitude = defect.Latitude,
