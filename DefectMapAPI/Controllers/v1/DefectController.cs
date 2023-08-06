@@ -62,7 +62,7 @@ namespace DefectMapAPI.Controllers.v1
         [HttpGet("find")]
         public async Task<IActionResult> Find([FromQuery] string name)
         {
-            var foundDefects = await defectRepository.FindAsync(x => x.Name == name);
+            var foundDefects = await defectRepository.FindAsync(x => x.Name.Contains(name) || x.Description.Contains(name));
 
             return Ok(foundDefects);
         }
