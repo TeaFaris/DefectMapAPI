@@ -1,0 +1,40 @@
+version: '3.4'
+
+networks:
+  dev:
+    driver: bridge
+
+services:
+  defectmapapi:
+    image: ${DOCKER_REGISTRY-}defectmapapi
+    depends_on:
+      - "defectmapapi_db"
+    container_name: defectmapapi-services
+    build:
+      context: .
+      dockerfile: DefectMapAPI/Dockerfile
+    environment:
+      ConnectionStrings__DefaultConnection: "User ID=postgres;Password=postgres;Server=defectmapapi_db;Port=5432;Database=DefectMapAPI;Pooling=true;"
+      JwtSettings__Issuer: "https://localhost:52919/"
+      JwtSettings__Audience: "https://localhost:52919/"
+      JwtSettings__Key: "ZUia9JmPIlE9MJCD3Jwx0atFPvMpbZk4"
+    networks:
+      - dev
+  defectmapapi_db:
+    image: postgres:latest
+    container_name: defectmapapi_db
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+      POSTGRES_DB: "DefectMapAPI"
+    ports:
+      - 5433:5432
+    restart: always
+    volumes:
+      - defectmapapidata:/var/lib/postgresql/data
+    networks:
+      - dev
+
+volumes:
+  defectmapapidata:
